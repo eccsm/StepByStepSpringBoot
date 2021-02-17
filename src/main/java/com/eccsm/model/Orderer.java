@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -23,34 +24,28 @@ import lombok.Data;
 @Entity
 @Data
 public class Orderer implements UserDetails {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
-	
+
 	@NotNull
-	@Size(min = 4, max=255)
+	@Size(min = 4, max = 255)
 	private String username;
-	
+
 	@Email
 	@NotNull
 	private String email;
-	
+
 	@NotNull
-	@Size(min = 8, max=255)
+	@Size(min = 8, max = 255)
 	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$")
 	private String password;
-	
 
-	@OneToMany(mappedBy="orderer", cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "orderer", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
 	private List<Cart> orders;
-	
-	@OneToMany(mappedBy="orderer", cascade=CascadeType.REMOVE)
-	private List<Token> tokens;
-	
-	
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -76,7 +71,5 @@ public class Orderer implements UserDetails {
 	public boolean isEnabled() {
 		return true;
 	}
-	
-	
 
 }

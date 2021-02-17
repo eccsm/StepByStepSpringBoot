@@ -20,34 +20,40 @@ import com.eccsm.utils.Credentials;
 
 @Service
 public class AuthService {
-	
+
 	@Autowired
 	IOrderer ordererRepository;
 	@Autowired
 	IToken tokenRepository;
-	
+
 	PasswordEncoder passwordEncoder;
-	
-	
+
 	public AuthService(PasswordEncoder passwordEncoder) {
 		super();
 		this.passwordEncoder = passwordEncoder;
 	}
 
+	public Boolean isValidUser(Credentials credentials) {
+		if (ordererRepository.findByUsername(credentials.getUsername()) != null) {
+			return true;
+		} else {
+			return false;
+		}
 
-	public AuthResponse authorization(Credentials credentials) throws Exception
-	{
+	}
+
+	public AuthResponse authorization(Credentials credentials) throws Exception {
 		Orderer inDB = ordererRepository.findByUsername(credentials.getUsername());
-		if(inDB == null) {
-			throw new Exception();			
+		if (inDB == null) {
+			throw new Exception();
 		}
 		boolean matches = passwordEncoder.matches(credentials.getPassword(), inDB.getPassword());
-		if(!matches) {
+		if (!matches) {
 			throw new Exception();
 		}
 		OrdererVM ordererVm = new OrdererVM(inDB);
 		String token = generateRandomToken();
-		
+
 		Token tokenEntity = new Token();
 		tokenEntity.setToken(token);
 		tokenEntity.setOrderer(inDB);
@@ -57,26 +63,22 @@ public class AuthService {
 		response.setToken(token);
 		return response;
 	}
-	
+
 	@Transactional
 	public UserDetails getUserDetails(String token) {
 		Optional<Token> optionalToken = tokenRepository.findById(token);
-		if(!optionalToken.isPresent()) {
+		if (!optionalToken.isPresent()) {
 			return null;
 		}
 		return optionalToken.get().getOrderer();
 	}
-	
-	
+
 	public String generateRandomToken() {
 		return UUID.randomUUID().toString().replaceAll("-", "");
 	}
 
-
 	public void clearToken(String token) {
 		tokenRepository.deleteById(token);
 	}
-	
-	
 
 }

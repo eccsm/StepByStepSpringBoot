@@ -1,9 +1,14 @@
 package com.eccsm.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,16 +16,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.eccsm.model.Orderer;
 import com.eccsm.model.vm.OrdererVM;
 import com.eccsm.service.OrdererService;
-import com.eccsm.utils.CurrentUser;
 import com.eccsm.utils.GenericResponse;
 
 import javassist.NotFoundException;
 
 @RestController
+@SessionAttributes("username")
 public class OrdererController {
 
 	@Autowired
@@ -33,13 +39,23 @@ public class OrdererController {
 	}
 
 	@GetMapping("/orderers")
-	OrdererVM getUsers() {
-		return (OrdererVM) ordererService.getOrderers();
+	List<OrdererVM> getUsers() {
+		List<Orderer> ordererList = ordererService.getOrderers();
+		List<OrdererVM> listVM = new ArrayList<OrdererVM>();
+
+		if (ordererList.size() > 0) {
+			for (int i = 0; i < ordererList.size(); i++) {
+				listVM.add(new OrdererVM(ordererList.get(i)));
+
+			}
+		}
+		return listVM;
 	}
-	
+
 	@GetMapping("/current")
-	Orderer getCurrent(@CurrentUser Orderer orderer) {
-		return ordererService.getCurrentOrderer(orderer);
+	public void getCurrent() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		System.out.println(auth.getName());
 	}
 
 	@GetMapping("/orderers/{username}")
