@@ -8,7 +8,7 @@
 			<li><a href="/orders">Orders</a></li>
 		</ul>
 		<ul class="nav navbar-nav navbar-right">
-			<li><a href="/signout">Logout</a></li>
+			<li><a href="/logout">Logout</a></li>
 		</ul>
 	</div>
 </nav>

@@ -31,16 +31,17 @@ public class Orderer implements UserDetails {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@NotNull
-	@Size(min = 4, max = 255)
+	@NotNull(message = "Userame cannot be null.")
+	@Size(min = 4, max = 255, message = "Username must be at least 4 characters.")
 	private String username;
 
 	@Email
-	@NotNull
+	@NotNull(message = "Email cannot be null.")
+	@Size(min = 8, max = 255, message = "Email must be at least 8 characters.")
 	private String email;
 
-	@NotNull
-	@Size(min = 8, max = 255)
+	@NotNull(message = "Password cannot be null.")
+	@Size(min = 8, max = 255, message = "Password must be at least 8 characters.")
 	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$")
 	private String password;
 

@@ -9,13 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.eccsm.model.Orderer;
@@ -25,17 +28,29 @@ import com.eccsm.utils.GenericResponse;
 
 import javassist.NotFoundException;
 
-@RestController
+@Controller
 @SessionAttributes("username")
 public class OrdererController {
 
 	@Autowired
 	OrdererService ordererService;
 
-	@PostMapping("/orderers")
-	public GenericResponse createUser(@Valid @RequestBody Orderer orderer) {
+	@RequestMapping("/register")
+	public String register(ModelMap model) {
+		model.addAttribute("orderer", new Orderer());
+		return "register";
+	}
+
+	@PostMapping("/register")
+	public String createUser(@Valid Orderer orderer, BindingResult result, ModelMap model) {
+		if (result.hasErrors()) {
+
+			return "register";
+		}
+
 		ordererService.save(orderer);
-		return new GenericResponse("user created");
+		model.put("registrationMessage", "Succesfully Created User " + orderer.getUsername());
+		return "login";
 	}
 
 	@GetMapping("/orderers")
